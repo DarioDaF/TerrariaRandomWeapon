@@ -1,3 +1,58 @@
-html {
-  font-family: sans-serif;
+
+* {
+  font-family: "Consolas", Arial, Helvetica, sans-serif;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  background: black;
+}
+
+.centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(0px, -50%);
+}
+
+.defaultText, .defaultButton {
+  color: white;
+  text-align: center;
+  font-size: 20px;
+}
+
+.defaultButton {
+  width: 100%;
+  background-color: transparent;
+  border: solid;
+  border-color: white;
+  border-width: 1px;
+  border-radius: 10px;
+}
+
+.defaultButton:hover, .defaultButton:focus {
+  outline: none;
+  border-color: lightseagreen;
+}
+
+.defaultButton:active {
+  outline: none;
+  border-color: blue;
+}
+
+.container {
+  padding: 10px;
+  border: solid;
+  border-color: white;
+  border-width: 5px;
+  border-radius: 5px;
+}
+
+#stage {
+  text-align: center;
+}
+
+#availWeapons {
+  text-align: center;
 }
