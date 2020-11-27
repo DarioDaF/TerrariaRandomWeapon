@@ -23,6 +23,7 @@ body {
 }
 
 .defaultButton {
+  margin: 5px;
   width: 100%;
   background-color: transparent;
   border: solid;
