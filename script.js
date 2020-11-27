@@ -26,6 +26,7 @@ const pickedWeaponPrompt = {
   current: null,
   currentlySelElement: null
 }
+let selectedWeapon = null;
 
 const weaponBlacklist = {};
 
@@ -68,7 +69,7 @@ function updateMainView() {
   currentStage.element.innerText = currentStage.originalText.replace(
     "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
   );
-  pickedWeaponPrompt.currentlySelElement.innerText = pickedWeaponPrompt.cSEOriginalText.replace("%CURRENT_WEAPON%", pickedWeaponPrompt.current === null ? "None" : pickedWeaponPrompt.current);
+  pickedWeaponPrompt.currentlySelElement.innerText = pickedWeaponPrompt.cSEOriginalText.replace("%CURRENT_WEAPON%", selectedWeapon === null || selectedWeapon === undefined ? "None" : selectedWeapon);
   availWeapons.element.innerText = availWeapons.originalText.replace("%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length);
 }
 
@@ -103,28 +104,37 @@ function populateWeaponList() {
     wList.removeChild(wList.lastElementChild);
   }
 
-  getAvailableWeapons(currentStage.current, { }).forEach(name => {
+  const allWeapons = getAvailableWeapons(currentStage.current, { });
+  allWeapons.sort();
+  allWeapons.forEach(name => {
     const button = document.createElement("button");
     button.id = `blacklistButton_${name}`;
-    button.classList.add("defaultButton");
+    button.classList.add("defaultButton", "blacklistButton", "left");
 
     const label = document.createElement("label");
-    label.innerText = name;
+    label.innerText = "";
     label.classList.add("defaultText");
     label.htmlFor = button.id;
 
     button.onclick = (b, ev, sync = false) => {
       if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
       button.innerText = weaponBlacklist[name] ? "WHITELIST" : "BLACKLIST";
+      label.innerHTML = `<span style="color: ${selectedWeapon === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
       updateMainView();
     }
 
     button.onclick(undefined, undefined, true);
 
-    wList.appendChild(label);
     wList.appendChild(button);
+    wList.appendChild(label);
     wList.appendChild(document.createElement("br"));
   });
+}
+
+function syncWeaponButton(name) {
+  if (name === null) { return; }
+  const buttonToSync = document.getElementById(`blacklistButton_${name}`);
+  buttonToSync.onclick(undefined, undefined, true);
 }
 
 function toggleWeaponList() {
@@ -137,27 +147,26 @@ function toggleWeaponList() {
   }
 }
 
-function acceptRandomWeapon(addToBlacklist = false) {
+function setSelectedWeapon(value, addToBlacklist = false) {
   pickedWeaponPrompt.parent.classList.add("hidden");
+  const oldWeapon = selectedWeapon;
+  selectedWeapon = value;
   if (addToBlacklist) {
-    weaponBlacklist[pickedWeaponPrompt.current] = true;
-
-    const buttonToSync = document.getElementById(`blacklistButton_${pickedWeaponPrompt.current}`);
-    buttonToSync.onclick(undefined, undefined, true);
+    weaponBlacklist[selectedWeapon] = true;
   }
+  
+  syncWeaponButton(selectedWeapon);
+  syncWeaponButton(oldWeapon);
+
   updateMainView();
 }
 
-function rejectRandomWeapon(addToBlacklist = false) {
-  pickedWeaponPrompt.parent.classList.add("hidden");
-  if (addToBlacklist) {
-    weaponBlacklist[pickedWeaponPrompt.current] = true;
+function acceptRandomWeapon(addToBlacklist = false) {
+  setSelectedWeapon(pickedWeaponPrompt.current, addToBlacklist);
+}
 
-    const buttonToSync = document.getElementById(`blacklistButton_${pickedWeaponPrompt.current}`);
-    buttonToSync.onclick(undefined, undefined, true);
-  }
-  pickedWeaponPrompt.current = null;
-  updateMainView();
+function rejectRandomWeapon(addToBlacklist = false) {
+  setSelectedWeapon(null, addToBlacklist);
 }
 
 window.addEventListener("load", async () => {
