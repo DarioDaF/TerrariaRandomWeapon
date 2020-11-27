@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta charset="UTF-8">
+    <!-- meta name="viewport" content="width=device-width, initial-scale=1.0" -->
     <title>Terraira Random Weapon</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js"></script>
   </head>
   <body>
     <div class="centered container">
-      <p class="defaultText" id="currentStage">Current Stage: %CURRENT_STAGE%</p>
+      <p class="defaultText" id="currentStage">Current Stage: %CURRENT_STAGE%♥♦♣♠•◘○◙♂☻☺○◙♂♀♪♫☼►◄↕‼¶§▬↨↑↓→←</p>
       <p class="defaultText" id="availWeapons">Available Weapons: %WEAPON_COUNT%</p>
-      <button class="defaultButton">Get Random Weapon</button>
-      <div>
-        <button class="defaultButton" onclick="nextStage()">Next Stage</button>
-        <button class="defaultButton" onclick="previousStage()">Previous Stage</button>
-      </div>
+      <button class="defaultButton" onclick="getRandomWeaponPressed()">Get Random Weapon</button>
+      <button class="defaultButton" onclick="nextStage()">Next Stage</button>
+      <button class="defaultButton" onclick="previousStage()">Previous Stage</button>
+    </div>
+    <div class="centered container hidden" id="chosenWeaponPrompt">
+      <p class="defaultText" id="selectedWeapon">Picked %SELECTED_WEAPON%</p>
+      <button class="defaultButton" onclick="acceptRandomWeapon()">Accept</button>
+      <button class="defaultButton" onclick="acceptRandomWeapon(true)">Accept & Blacklist</button>
+      <button class="defaultButton" onclick="rejectRandomWeapon()">Reject</button>
+      <button class="defaultButton" onclick="rejectRandomWeapon(true)">Reject & Blacklist</button>
+    </div>
+    <div class="bottomLeft container">
+      <p class="defaultText" id="currentlyAcceptedWeapon">Current Weapon: %CURRENT_WEAPON%</p>
     </div>
   </body>
 </html>
