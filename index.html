@@ -17,7 +17,7 @@
       <button class="defaultButton" onclick="toggleWeaponList()">Toggle Weapon List</button>
     </div>
     <div class="centered container hidden" id="chosenWeaponPrompt">
-      <p class="defaultText" id="selectedWeapon">Picked %SELECTED_WEAPON%</p>
+      <p class="defaultText" id="randomlySelectedWeapon">Picked %SELECTED_WEAPON%</p>
       <button class="defaultButton" onclick="acceptRandomWeapon()">Accept</button>
       <button class="defaultButton" onclick="acceptRandomWeapon(true)">Accept & Blacklist</button>
       <button class="defaultButton" onclick="rejectRandomWeapon()">Reject</button>
@@ -25,7 +25,7 @@
     </div>
     <div class="top left container hidden" id="weaponList"></div>
     <div class="bottom left container">
-      <p class="defaultText" id="currentlyAcceptedWeapon">Current Weapon: %CURRENT_WEAPON%</p>
+      <p class="defaultText" id="selectedWeapon">Current Weapon: %CURRENT_WEAPON%</p>
     </div>
   </body>
 </html>

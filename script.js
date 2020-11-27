@@ -19,22 +19,28 @@ const availWeapons = {
 }
 
 /** @type {ElementWDynamicText} */
-const pickedWeaponPrompt = {
+const randomWeaponPrompt = {
   element: null,
   parent: null,
   originalText: "",
-  current: null,
-  currentlySelElement: null
+  current: null
 }
-let selectedWeapon = null;
+
+/** @type {ElementWDynamicText} */
+let selectedWeapon = {
+  element: null,
+  originalText: "",
+  name: null
+};
 
 const weaponBlacklist = {};
 
 let data = {};
 /**
- * @param {Number} [stageI]
- * @param {Object<String, Boolean>} [blacklist]
- * @returns {String[]}
+ * Gets all available weapons at the specified stage with the specified blacklist
+ * @param {Number} [stageI] - The stage's index
+ * @param {Object<String, Boolean>} [blacklist] - The weapons' blacklist
+ * @returns {String[]} An array that contains all available weapons' name
  */
 function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
   const weapons = [];
@@ -48,51 +54,68 @@ function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
 }
 
 /**
- * @param {Number} [stageI]
- * @returns {String}
+ * Returns the name of the specified stage
+ * @param {Number} [stageI] - The stage's index
+ * @returns {String} The name of the specified stage
  */
 function getStageName(stageI = 0) {
   return data.stages[Math.min(Math.max(stageI, 0), data.stages.length - 1)].name;
 }
 
 /**
- * @param {Number} [stageI]
- * @param {Object<String, Boolean>} [blacklist]
- * @returns {String}
+ * Picks a random weapon that is available at the specified stage with the specified blacklist
+ * @param {Number} [stageI] - The stage's index
+ * @param {Object<String, Boolean>} [blacklist] - The weapons' blacklist
+ * @returns {String} The name of a randomly picked weapon
  */
 function pickRandomWeapon(stageI = 0, blacklist = weaponBlacklist) {
   const availWeapons = getAvailableWeapons(stageI, blacklist);
   return availWeapons[Math.floor(Math.random() * availWeapons.length)];
 }
 
+/**
+ * Updates things that are always shown
+ */
 function updateMainView() {
   currentStage.element.innerText = currentStage.originalText.replace(
     "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
   );
-  pickedWeaponPrompt.currentlySelElement.innerText = pickedWeaponPrompt.cSEOriginalText.replace("%CURRENT_WEAPON%", selectedWeapon === null || selectedWeapon === undefined ? "None" : selectedWeapon);
+  selectedWeapon.element.innerText = selectedWeapon.originalText.replace("%CURRENT_WEAPON%", selectedWeapon.name === null || selectedWeapon.name === undefined ? "None" : selectedWeapon.name);
   availWeapons.element.innerText = availWeapons.originalText.replace("%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length);
 }
 
+/**
+ * Goes to the next stage
+ */
 function nextStage() {
   populateWeaponList();
   currentStage.current = Math.min(Math.max(++currentStage.current, 0), data.stages.length - 1);
   updateMainView();
 }
 
+/**
+ * Goes back to the previous stage
+ */
 function previousStage() {
   populateWeaponList();
   currentStage.current = Math.min(Math.max(--currentStage.current, 0), data.stages.length - 1);
   updateMainView();
 }
 
+/**
+ * Called when "getRandomWeapon" button is pressed
+ */
 function getRandomWeaponPressed() {
-  pickedWeaponPrompt.parent.classList.remove("hidden");
+  randomWeaponPrompt.parent.classList.remove("hidden");
   
   const selWeapon = pickRandomWeapon(currentStage.current);
-  pickedWeaponPrompt.current = selWeapon;
-  pickedWeaponPrompt.element.innerText = pickedWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", selWeapon);
+  randomWeaponPrompt.current = selWeapon;
+  randomWeaponPrompt.element.innerText = randomWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", selWeapon);
 }
 
+/**
+ * Populates the list of weapons and creates all needed elements
+ */
 function populateWeaponList() {
   /** @type {HTMLDivElement} */
   const wList = document.getElementById("weaponList");
@@ -119,7 +142,7 @@ function populateWeaponList() {
     button.onclick = (b, ev, sync = false) => {
       if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
       button.innerText = weaponBlacklist[name] ? "WHITELIST" : "BLACKLIST";
-      label.innerHTML = `<span style="color: ${selectedWeapon === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
+      label.innerHTML = `<span style="color: ${selectedWeapon.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
       updateMainView();
     }
 
@@ -131,12 +154,20 @@ function populateWeaponList() {
   });
 }
 
+/**
+ * Syncs the specified weapon's button with its weapon's status
+ * @param {String} name - The name of the weapon to sync
+ */
 function syncWeaponButton(name) {
   if (name === null) { return; }
   const buttonToSync = document.getElementById(`blacklistButton_${name}`);
+  if (buttonToSync === null) { return; }
   buttonToSync.onclick(undefined, undefined, true);
 }
 
+/**
+ * Toggles weapon list's visibility
+ */
 function toggleWeaponList() {
   /** @type {HTMLDivElement} */
   const wList = document.getElementById("weaponList");
@@ -147,26 +178,40 @@ function toggleWeaponList() {
   }
 }
 
-function setSelectedWeapon(value, addToBlacklist = false) {
-  pickedWeaponPrompt.parent.classList.add("hidden");
-  const oldWeapon = selectedWeapon;
-  selectedWeapon = value;
+/**
+ * Accepts the currently random picked weapon
+ * @param {Boolean} addToBlacklist - Whether or not to add the weapon to the blacklist
+ */
+function acceptRandomWeapon(addToBlacklist = false) {
+  randomWeaponPrompt.parent.classList.add("hidden");
+  const oldWeapon = selectedWeapon.name;
+  selectedWeapon.name = randomWeaponPrompt.current;
   if (addToBlacklist) {
-    weaponBlacklist[selectedWeapon] = true;
+    weaponBlacklist[selectedWeapon.name] = true;
   }
   
-  syncWeaponButton(selectedWeapon);
+  syncWeaponButton(selectedWeapon.name);
   syncWeaponButton(oldWeapon);
 
   updateMainView();
 }
 
-function acceptRandomWeapon(addToBlacklist = false) {
-  setSelectedWeapon(pickedWeaponPrompt.current, addToBlacklist);
-}
-
+/**
+ * Rejects the currently random picked weapon
+ * @param {Boolean} addToBlacklist - Whether or not to add the weapon to the blacklist
+ */
 function rejectRandomWeapon(addToBlacklist = false) {
-  setSelectedWeapon(null, addToBlacklist);
+  randomWeaponPrompt.parent.classList.add("hidden");
+  const oldWeapon = selectedWeapon.name;
+  selectedWeapon.name = null;
+  if (addToBlacklist) {
+    weaponBlacklist[randomWeaponPrompt.current] = true;
+  }
+  
+  syncWeaponButton(randomWeaponPrompt.current);
+  syncWeaponButton(oldWeapon);
+
+  updateMainView();
 }
 
 window.addEventListener("load", async () => {
@@ -176,12 +221,12 @@ window.addEventListener("load", async () => {
   availWeapons.element = document.getElementById("availWeapons");
   availWeapons.originalText = availWeapons.element.innerText;
 
-  pickedWeaponPrompt.element = document.getElementById("selectedWeapon");
-  pickedWeaponPrompt.originalText = pickedWeaponPrompt.element.innerText;
-  pickedWeaponPrompt.parent = document.getElementById("chosenWeaponPrompt");
+  randomWeaponPrompt.element = document.getElementById("randomlySelectedWeapon");
+  randomWeaponPrompt.originalText = randomWeaponPrompt.element.innerText;
+  randomWeaponPrompt.parent = document.getElementById("chosenWeaponPrompt");
 
-  pickedWeaponPrompt.currentlySelElement = document.getElementById("currentlyAcceptedWeapon");
-  pickedWeaponPrompt.cSEOriginalText = pickedWeaponPrompt.currentlySelElement.innerText;
+  selectedWeapon.element = document.getElementById("selectedWeapon");
+  selectedWeapon.originalText = selectedWeapon.element.innerText;
 
   data = await (await fetch("data.json")).json();
 
