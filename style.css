@@ -9,11 +9,21 @@ body {
   background: black;
 }
 
+.hidden {
+  display: none;
+}
+
 .centered {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.bottomLeft {
+  position: absolute;
+  left: 0px;
+  bottom: 0px;
 }
 
 .defaultText, .defaultButton {
@@ -43,6 +53,7 @@ body {
 }
 
 .container {
+  background-color: black;
   padding: 10px;
   border: solid;
   border-color: white;
@@ -50,10 +61,6 @@ body {
   border-radius: 5px;
 }
 
-#stage {
-  text-align: center;
-}
-
-#availWeapons {
+#stage, #availWeapons {
   text-align: center;
 }
