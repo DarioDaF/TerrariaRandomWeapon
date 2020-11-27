@@ -13,17 +13,30 @@ body {
   display: none;
 }
 
-.centered {
+.centered, .top, .bottom, .left, .right {
   position: absolute;
+}
+
+.centered {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
 
-.bottomLeft {
-  position: absolute;
-  left: 0px;
+.top {
+  top: 0px;
+}
+
+.bottom {
   bottom: 0px;
+}
+
+.left {
+  left: 0px;
+}
+
+.right {
+  right: 0px;
 }
 
 .defaultText, .defaultButton {
