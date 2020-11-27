@@ -27,7 +27,7 @@ const pickedWeaponPrompt = {
   currentlySelElement: null
 }
 
-const PICKED_WEAPONS = {};
+const weaponBlacklist = {};
 
 let data = {};
 /**
@@ -35,7 +35,7 @@ let data = {};
  * @param {Object<String, Boolean>} [blacklist]
  * @returns {String[]}
  */
-function getAvailableWeapons(stageI = 0, blacklist = PICKED_WEAPONS) {
+function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
   const weapons = [];
   /** @type {String[]} */
   const stages = data.stages;
@@ -59,7 +59,7 @@ function getStageName(stageI = 0) {
  * @param {Object<String, Boolean>} [blacklist]
  * @returns {String}
  */
-function pickRandomWeapon(stageI = 0, blacklist = PICKED_WEAPONS) {
+function pickRandomWeapon(stageI = 0, blacklist = weaponBlacklist) {
   const availWeapons = getAvailableWeapons(stageI, blacklist);
   return availWeapons[Math.floor(Math.random() * availWeapons.length)];
 }
@@ -69,15 +69,17 @@ function updateMainView() {
     "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
   );
   pickedWeaponPrompt.currentlySelElement.innerText = pickedWeaponPrompt.cSEOriginalText.replace("%CURRENT_WEAPON%", pickedWeaponPrompt.current === null ? "None" : pickedWeaponPrompt.current);
-  availWeapons.element.innerText = availWeapons.originalText.replace("%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, PICKED_WEAPONS).length);
+  availWeapons.element.innerText = availWeapons.originalText.replace("%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length);
 }
 
 function nextStage() {
+  populateWeaponList();
   currentStage.current = Math.min(Math.max(++currentStage.current, 0), data.stages.length - 1);
   updateMainView();
 }
 
 function previousStage() {
+  populateWeaponList();
   currentStage.current = Math.min(Math.max(--currentStage.current, 0), data.stages.length - 1);
   updateMainView();
 }
@@ -90,18 +92,69 @@ function getRandomWeaponPressed() {
   pickedWeaponPrompt.element.innerText = pickedWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", selWeapon);
 }
 
-function acceptRandomWeapon(blacklist = false) {
+function populateWeaponList() {
+  /** @type {HTMLDivElement} */
+  const wList = document.getElementById("weaponList");
+  if (wList.classList.contains("hidden")) {
+    return;
+  }
+
+  while (wList.lastElementChild !== null) {
+    wList.removeChild(wList.lastElementChild);
+  }
+
+  getAvailableWeapons(currentStage.current, { }).forEach(name => {
+    const button = document.createElement("button");
+    button.id = `blacklistButton_${name}`;
+    button.classList.add("defaultButton");
+
+    const label = document.createElement("label");
+    label.innerText = name;
+    label.classList.add("defaultText");
+    label.htmlFor = button.id;
+
+    button.onclick = (b, ev, sync = false) => {
+      if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
+      button.innerText = weaponBlacklist[name] ? "WHITELIST" : "BLACKLIST";
+      updateMainView();
+    }
+
+    button.onclick(undefined, undefined, true);
+
+    wList.appendChild(label);
+    wList.appendChild(button);
+    wList.appendChild(document.createElement("br"));
+  });
+}
+
+function toggleWeaponList() {
+  /** @type {HTMLDivElement} */
+  const wList = document.getElementById("weaponList");
+  wList.classList.toggle("hidden");
+
+  if (!wList.classList.contains("hidden")) {
+    populateWeaponList();
+  }
+}
+
+function acceptRandomWeapon(addToBlacklist = false) {
   pickedWeaponPrompt.parent.classList.add("hidden");
-  if (blacklist) {
-    PICKED_WEAPONS[pickedWeaponPrompt.current] = true;
+  if (addToBlacklist) {
+    weaponBlacklist[pickedWeaponPrompt.current] = true;
+
+    const buttonToSync = document.getElementById(`blacklistButton_${pickedWeaponPrompt.current}`);
+    buttonToSync.onclick(undefined, undefined, true);
   }
   updateMainView();
 }
 
-function rejectRandomWeapon(blacklist = false) {
+function rejectRandomWeapon(addToBlacklist = false) {
   pickedWeaponPrompt.parent.classList.add("hidden");
-  if (blacklist) {
-    PICKED_WEAPONS[pickedWeaponPrompt.current] = true;
+  if (addToBlacklist) {
+    weaponBlacklist[pickedWeaponPrompt.current] = true;
+
+    const buttonToSync = document.getElementById(`blacklistButton_${pickedWeaponPrompt.current}`);
+    buttonToSync.onclick(undefined, undefined, true);
   }
   pickedWeaponPrompt.current = null;
   updateMainView();

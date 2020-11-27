@@ -14,6 +14,7 @@
       <button class="defaultButton" onclick="getRandomWeaponPressed()">Get Random Weapon</button>
       <button class="defaultButton" onclick="nextStage()">Next Stage</button>
       <button class="defaultButton" onclick="previousStage()">Previous Stage</button>
+      <button class="defaultButton" onclick="toggleWeaponList()">Toggle Weapon List</button>
     </div>
     <div class="centered container hidden" id="chosenWeaponPrompt">
       <p class="defaultText" id="selectedWeapon">Picked %SELECTED_WEAPON%</p>
@@ -22,6 +23,7 @@
       <button class="defaultButton" onclick="rejectRandomWeapon()">Reject</button>
       <button class="defaultButton" onclick="rejectRandomWeapon(true)">Reject & Blacklist</button>
     </div>
+    <div class="top left container hidden" id="weaponList"></div>
     <div class="bottom left container">
       <p class="defaultText" id="currentlyAcceptedWeapon">Current Weapon: %CURRENT_WEAPON%</p>
     </div>

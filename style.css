@@ -1,5 +1,6 @@
 
 * {
+  overflow: hidden;
   font-family: "Consolas", Arial, Helvetica, sans-serif;
 }
 
@@ -74,6 +75,17 @@ body {
   border-radius: 5px;
 }
 
+.blacklistButton {
+  width: fit-content;
+}
+
 #stage, #availWeapons {
   text-align: center;
+}
+
+#weaponList {
+  max-height: 50%;
+  max-width: 50%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
