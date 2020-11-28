@@ -233,7 +233,7 @@ function acceptRandomWeapon(addToBlacklist = false) {
  */
 function rejectRandomWeapon(addToBlacklist = false) {
   randomWeaponPrompt.parent.classList.add("hidden");
-  selectedWeapon = null;
+  selectedWeapon.selected = null;
   if (addToBlacklist) {
     weaponBlacklist[randomWeaponPrompt.current.name] = true;
   }
