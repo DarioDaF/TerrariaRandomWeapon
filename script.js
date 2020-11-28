@@ -38,7 +38,7 @@ const weaponList = {
   buttons: [ ]
 }
 
-const weaponBlacklist = {};
+let weaponBlacklist = {};
 
 let data = {};
 /**
@@ -133,7 +133,7 @@ function populateWeaponList() {
 
     button.onclick = (b, ev, sync = false) => {
       if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
-      
+
       const newButtonText = weaponBlacklist[name] ? "W" : "B";
       if (button.innerText !== newButtonText) {
         button.innerText = newButtonText;
@@ -212,6 +212,44 @@ function rejectRandomWeapon(addToBlacklist = false) {
   selectedWeapon.name = null;
   if (addToBlacklist) {
     weaponBlacklist[randomWeaponPrompt.current] = true;
+  }
+}
+
+/**
+ * Saves the current state to localStorage
+ */
+function saveToLocal() {
+  localStorage.clear();
+  localStorage.setItem("weaponBlacklist", JSON.stringify(weaponBlacklist));
+  localStorage.setItem("selectedWeapon", selectedWeapon.name);
+  localStorage.setItem("currentStage", currentStage.current);
+}
+
+/**
+ * Loads a saved state from localStorage
+ */
+function loadFromLocal() {
+  const wBlacklist = localStorage.getItem("weaponBlacklist");
+  if (wBlacklist === null) {
+    weaponBlacklist = { };
+  } else {
+    try {
+      weaponBlacklist = JSON.parse(wBlacklist);
+    } catch (error) {
+      localStorage.removeItem("weaponBlacklist");
+      console.log("There was an error while parsing weapon blacklist and it was resetted!");
+      console.error(error);
+    }
+  }
+  
+  const sWeapon = localStorage.getItem("selectedWeapon");
+  selectedWeapon.name = sWeapon;
+
+  const cStage = Number(localStorage.getItem("currentStage"));
+  if (Number.isNaN(cStage)) {
+    currentStage.current = 0;
+  } else {
+    currentStage.current = localStorage.getItem("currentStage");
   }
 }
 
