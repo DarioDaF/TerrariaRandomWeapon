@@ -133,8 +133,16 @@ function populateWeaponList() {
 
     button.onclick = (b, ev, sync = false) => {
       if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
-      button.innerText = weaponBlacklist[name] ? "W" : "B";
-      label.innerHTML = `<span style="color: ${selectedWeapon.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
+      
+      const newButtonText = weaponBlacklist[name] ? "W" : "B";
+      if (button.innerText !== newButtonText) {
+        button.innerText = newButtonText;
+      }
+
+      const newLabelHTML = `<span style="color: ${selectedWeapon.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
+      if (label.innerHTML !== newLabelHTML) {
+        label.innerHTML = newLabelHTML;
+      }
     }
 
     button.onclick(undefined, undefined, true);
