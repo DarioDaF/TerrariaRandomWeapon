@@ -116,22 +116,24 @@ function populateWeaponList() {
   while (weaponList.element.lastElementChild !== null) {
     weaponList.element.removeChild(weaponList.element.lastElementChild);
   }
+  
+  weaponList.buttons = [ ];
 
   const allWeapons = getAvailableWeapons(currentStage.current, { });
   allWeapons.sort();
   allWeapons.forEach(name => {
     const button = document.createElement("button");
     button.id = `blacklistButton_${name}`;
-    button.classList.add("defaultButton", "blacklistButton", "left");
+    button.classList.add("defaultButton", "weaponListButton", "left");
 
     const label = document.createElement("label");
     label.innerText = "";
-    label.classList.add("defaultText");
+    label.classList.add("defaultText", "weaponListLabel");
     label.htmlFor = button.id;
 
     button.onclick = (b, ev, sync = false) => {
       if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
-      button.innerText = weaponBlacklist[name] ? "WHITELIST" : "BLACKLIST";
+      button.innerText = weaponBlacklist[name] ? "W" : "B";
       label.innerHTML = `<span style="color: ${selectedWeapon.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
     }
 
@@ -152,8 +154,14 @@ function updateElements() {
   currentStage.element.innerText = currentStage.originalText.replace(
     "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
   );
-  selectedWeapon.element.innerText = selectedWeapon.originalText.replace("%CURRENT_WEAPON%", selectedWeapon.name === null || selectedWeapon.name === undefined ? "None" : selectedWeapon.name);
-  availWeapons.element.innerText = availWeapons.originalText.replace("%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length);
+  
+  selectedWeapon.element.innerText = selectedWeapon.originalText.replace(
+    "%CURRENT_WEAPON%", selectedWeapon.name === null || selectedWeapon.name === undefined ? "None" : selectedWeapon.name
+  );
+  
+  availWeapons.element.innerText = availWeapons.originalText.replace(
+    "%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length
+  );
   
   if (!weaponList.element.classList.contains("hidden")) {
     weaponList.buttons.forEach(

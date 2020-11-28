@@ -72,8 +72,14 @@ body {
   border-radius: 5px;
 }
 
-.blacklistButton {
-  width: auto;
+.weaponListButton {
+  display: inline;
+  width: fit-content;
+}
+
+.weaponListLabel {
+  display: inline;
+  margin-left: 5px;
 }
 
 #stage, #availWeapons {
