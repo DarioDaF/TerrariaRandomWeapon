@@ -1,46 +1,45 @@
 
 /**
- * @typedef ElementWDynamicText
- * @property {HTMLParagraphElement} element
- * @property {String} originalText
- */
-
-/**
  * @typedef WeaponData
  * @property {String} name
  * @property {String} img
  */
 
-/** @type {ElementWDynamicText} */
 const currentStage = {
+  /** @type {HTMLDivElement} */
   element: null,
   originalText: "",
   current: -1
 }
 
-/** @type {ElementWDynamicText} */
 const availWeapons = {
+  /** @type {HTMLDivElement} */
   element: null,
   originalText: ""
 }
 
-/** @type {ElementWDynamicText} */
 const randomWeaponPrompt = {
+  /** @type {HTMLDivElement} */
   element: null,
+  /** @type {HTMLDivElement} */
   parent: null,
   originalText: "",
+  /** @type {WeaponData} */
   current: null
 }
 
-/** @type {ElementWDynamicText} */
 const selectedWeapon = {
+  /** @type {HTMLDivElement} */
   element: null,
   originalText: "",
+  /** @type {WeaponData} */
   selected: null
 };
 
 const weaponList = {
+  /** @type {HTMLDivElement} */
   element: null,
+  /** @type {HTMLButtonElement[]} */
   buttons: [ ]
 }
 
