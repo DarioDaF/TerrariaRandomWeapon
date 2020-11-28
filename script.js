@@ -101,6 +101,19 @@ function previousStage() {
 }
 
 /**
+ * Creates a new HTML string from the specified weapon
+ * @param {WeaponData} weapon - The weapon to create the HTML string from
+ * @returns {String} The HTML for the specified weapon
+ */
+function createWeaponHTML(weapon) {
+  if (weapon === null || weapon === undefined) {
+    return "None";
+  }
+
+  return `<img class="selectedWeaponImage" src="${weapon.img === undefined ? "" : weapon.img}"> ${weapon.name}`;
+}
+
+/**
  * Called when "getRandomWeapon" button is pressed
  */
 function getRandomWeaponPressed() {
@@ -108,7 +121,7 @@ function getRandomWeaponPressed() {
   
   const selWeapon = pickRandomWeapon(currentStage.current);
   randomWeaponPrompt.current = selWeapon;
-  randomWeaponPrompt.element.innerText = randomWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", selWeapon.name);
+  randomWeaponPrompt.element.innerHTML = randomWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", createWeaponHTML(selWeapon));
 }
 
 /**
@@ -129,6 +142,8 @@ function populateWeaponList() {
   allWeapons.sort((a, b) => { return a.name > b.name ? 1 : -1; });
   allWeapons.forEach(weapon => {
     const name = weapon.name;
+    const div = document.createElement("div");
+
     const button = document.createElement("button");
     button.id = `blacklistButton_${name}`;
     button.classList.add("defaultButton", "weaponListButton", "left");
@@ -146,7 +161,7 @@ function populateWeaponList() {
         button.innerText = newButtonText;
       }
 
-      const newLabelHTML = `<span style="color: ${selectedWeapon.selected !== null && selectedWeapon.selected.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
+      const newLabelHTML = `<span style="color: ${selectedWeapon.selected !== null && selectedWeapon.selected.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${createWeaponHTML(weapon)}</span>`;
       if (label.innerHTML !== newLabelHTML) {
         label.innerHTML = newLabelHTML;
       }
@@ -154,9 +169,10 @@ function populateWeaponList() {
 
     button.onclick(undefined, undefined, true);
 
-    weaponList.element.appendChild(button);
-    weaponList.element.appendChild(label);
-    weaponList.element.appendChild(document.createElement("br"));
+    div.appendChild(button);
+    div.appendChild(label);
+
+    weaponList.element.appendChild(div);
 
     weaponList.buttons.push(button);
   });
@@ -170,11 +186,7 @@ function updateElements() {
     "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
   );
   
-  const isWeaponSelected = selectedWeapon.selected !== null && selectedWeapon.selected !== undefined;
-  const selWeaponHTML = selectedWeapon.originalText.replace(
-    "%CURRENT_WEAPON%",
-    isWeaponSelected ? `<img class="selectedWeaponImage" src="${isWeaponSelected ? selectedWeapon.selected.img : ""}"> ${selectedWeapon.selected.name}` : "None"
-  );
+  const selWeaponHTML = selectedWeapon.originalText.replace("%CURRENT_WEAPON%", createWeaponHTML(selectedWeapon.selected));
   if (selWeaponHTML !== selectedWeapon.element.innerHTML) {
     selectedWeapon.element.innerHTML = selWeaponHTML;
   }
@@ -211,7 +223,7 @@ function acceptRandomWeapon(addToBlacklist = false) {
   randomWeaponPrompt.parent.classList.add("hidden");
   selectedWeapon.selected = randomWeaponPrompt.current;
   if (addToBlacklist) {
-    weaponBlacklist[selectedWeapon.name] = true;
+    weaponBlacklist[selectedWeapon.selected.name] = true;
   }
 }
 
