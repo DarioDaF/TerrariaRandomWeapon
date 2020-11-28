@@ -249,7 +249,7 @@ function loadFromLocal() {
   if (Number.isNaN(cStage)) {
     currentStage.current = 0;
   } else {
-    currentStage.current = localStorage.getItem("currentStage");
+    currentStage.current = cStage;
   }
 }
 
