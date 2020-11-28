@@ -110,7 +110,7 @@ function createWeaponHTML(weapon) {
     return "None";
   }
 
-  return `<img class="selectedWeaponImage" src="${weapon.img === undefined ? "" : weapon.img}"> ${weapon.name}`;
+  return `<img class="weaponImage" src="${weapon.img === undefined ? "" : weapon.img}"> ${weapon.name}`;
 }
 
 /**
@@ -295,7 +295,6 @@ window.addEventListener("load", async () => {
   randomWeaponPrompt.parent = document.getElementById("chosenWeaponPrompt");
 
   selectedWeapon.element = document.getElementById("selectedWeapon");
-  selectedWeapon.imgElement = document.getElementById("selectedWeaponImage");
   selectedWeapon.originalText = selectedWeapon.element.innerText;
 
   /** @type {HTMLDivElement} */

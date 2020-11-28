@@ -97,10 +97,10 @@ body {
   font-size: 15px;
 }
 
-#selectedWeapon, .selectedWeaponImage {
+#selectedWeapon, .weaponImage {
   display: inline;
 }
 
-.selectedWeaponImage {
+.weaponImage {
   height: 20px;
 }
