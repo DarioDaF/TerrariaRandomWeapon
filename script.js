@@ -160,7 +160,7 @@ function populateWeaponList() {
         button.innerText = newButtonText;
       }
 
-      const newLabelHTML = `<span style="color: ${selectedWeapon.selected !== null && selectedWeapon.selected.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${createWeaponHTML(weapon)}</span>`;
+      const newLabelHTML = `<span style="color: ${selectedWeapon.selected !== null && selectedWeapon.selected.name === name ? "blue" : weaponBlacklist[name] ? "red" : "white"}">${createWeaponHTML(weapon)}</span>`;
       if (label.innerHTML !== newLabelHTML) {
         label.innerHTML = newLabelHTML;
       }
