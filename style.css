@@ -96,3 +96,11 @@ body {
 #credits {
   font-size: 15px;
 }
+
+#selectedWeapon, .selectedWeaponImage {
+  display: inline;
+}
+
+.selectedWeaponImage {
+  height: 20px;
+}

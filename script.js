@@ -5,6 +5,12 @@
  * @property {String} originalText
  */
 
+/**
+ * @typedef WeaponData
+ * @property {String} name
+ * @property {String} img
+ */
+
 /** @type {ElementWDynamicText} */
 const currentStage = {
   element: null,
@@ -30,7 +36,7 @@ const randomWeaponPrompt = {
 const selectedWeapon = {
   element: null,
   originalText: "",
-  name: null
+  selected: null
 };
 
 const weaponList = {
@@ -45,7 +51,7 @@ let data = {};
  * Gets all available weapons at the specified stage with the specified blacklist
  * @param {Number} [stageI] - The stage's index
  * @param {Object<String, Boolean>} [blacklist] - The weapons' blacklist
- * @returns {String[]} An array that contains all available weapons' name
+ * @returns {WeaponData[]} An array that contains all available weapons
  */
 function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
   const weapons = [];
@@ -55,7 +61,7 @@ function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
   for (let i = 0; i <= stageI; i++) {
     weapons.push(...stages[i].weapons);
   }
-  return weapons.filter(v => !blacklist[v]);
+  return weapons.filter(w => !blacklist[w.name]);
 }
 
 /**
@@ -71,7 +77,7 @@ function getStageName(stageI = 0) {
  * Picks a random weapon that is available at the specified stage with the specified blacklist
  * @param {Number} [stageI] - The stage's index
  * @param {Object<String, Boolean>} [blacklist] - The weapons' blacklist
- * @returns {String} The name of a randomly picked weapon
+ * @returns {WeaponData} The name of a randomly picked weapon
  */
 function pickRandomWeapon(stageI = 0, blacklist = weaponBlacklist) {
   const availWeapons = getAvailableWeapons(stageI, blacklist);
@@ -102,7 +108,7 @@ function getRandomWeaponPressed() {
   
   const selWeapon = pickRandomWeapon(currentStage.current);
   randomWeaponPrompt.current = selWeapon;
-  randomWeaponPrompt.element.innerText = randomWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", selWeapon);
+  randomWeaponPrompt.element.innerText = randomWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", selWeapon.name);
 }
 
 /**
@@ -120,8 +126,9 @@ function populateWeaponList() {
   weaponList.buttons = [ ];
 
   const allWeapons = getAvailableWeapons(currentStage.current, { });
-  allWeapons.sort();
-  allWeapons.forEach(name => {
+  allWeapons.sort((a, b) => { return a.name > b.name ? 1 : -1; });
+  allWeapons.forEach(weapon => {
+    const name = weapon.name;
     const button = document.createElement("button");
     button.id = `blacklistButton_${name}`;
     button.classList.add("defaultButton", "weaponListButton", "left");
@@ -139,7 +146,7 @@ function populateWeaponList() {
         button.innerText = newButtonText;
       }
 
-      const newLabelHTML = `<span style="color: ${selectedWeapon.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
+      const newLabelHTML = `<span style="color: ${selectedWeapon.selected !== null && selectedWeapon.selected.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
       if (label.innerHTML !== newLabelHTML) {
         label.innerHTML = newLabelHTML;
       }
@@ -163,9 +170,14 @@ function updateElements() {
     "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
   );
   
-  selectedWeapon.element.innerText = selectedWeapon.originalText.replace(
-    "%CURRENT_WEAPON%", selectedWeapon.name === null || selectedWeapon.name === undefined ? "None" : selectedWeapon.name
+  const isWeaponSelected = selectedWeapon.selected !== null && selectedWeapon.selected !== undefined;
+  const selWeaponHTML = selectedWeapon.originalText.replace(
+    "%CURRENT_WEAPON%",
+    isWeaponSelected ? `<img class="selectedWeaponImage" src="${isWeaponSelected ? selectedWeapon.selected.img : ""}"> ${selectedWeapon.selected.name}` : "None"
   );
+  if (selWeaponHTML !== selectedWeapon.element.innerHTML) {
+    selectedWeapon.element.innerHTML = selWeaponHTML;
+  }
   
   availWeapons.element.innerText = availWeapons.originalText.replace(
     "%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length
@@ -197,7 +209,7 @@ function toggleWeaponList() {
  */
 function acceptRandomWeapon(addToBlacklist = false) {
   randomWeaponPrompt.parent.classList.add("hidden");
-  selectedWeapon.name = randomWeaponPrompt.current;
+  selectedWeapon.selected = randomWeaponPrompt.current;
   if (addToBlacklist) {
     weaponBlacklist[selectedWeapon.name] = true;
   }
@@ -209,9 +221,9 @@ function acceptRandomWeapon(addToBlacklist = false) {
  */
 function rejectRandomWeapon(addToBlacklist = false) {
   randomWeaponPrompt.parent.classList.add("hidden");
-  selectedWeapon.name = null;
+  selectedWeapon = null;
   if (addToBlacklist) {
-    weaponBlacklist[randomWeaponPrompt.current] = true;
+    weaponBlacklist[randomWeaponPrompt.current.name] = true;
   }
 }
 
@@ -221,7 +233,7 @@ function rejectRandomWeapon(addToBlacklist = false) {
 function saveToLocal() {
   localStorage.clear();
   localStorage.setItem("weaponBlacklist", JSON.stringify(weaponBlacklist));
-  localStorage.setItem("selectedWeapon", selectedWeapon.name);
+  localStorage.setItem("selectedWeapon", JSON.stringify(selectedWeapon.selected));
   localStorage.setItem("currentStage", currentStage.current);
 }
 
@@ -237,13 +249,19 @@ function loadFromLocal() {
       weaponBlacklist = JSON.parse(wBlacklist);
     } catch (error) {
       localStorage.removeItem("weaponBlacklist");
-      console.log("There was an error while parsing weapon blacklist and it was resetted!");
+      console.log("There was an error while parsing weapon blacklist and it was reset!");
       console.error(error);
     }
   }
   
   const sWeapon = localStorage.getItem("selectedWeapon");
-  selectedWeapon.name = sWeapon;
+  try {
+    selectedWeapon.selected = JSON.parse(sWeapon);
+  } catch (error) {
+    localStorage.removeItem("selectedWeapon");
+    console.log("There was an error while parsing selected weapon and it was reset!");
+    console.error(error);
+  }
 
   const cStage = Number(localStorage.getItem("currentStage"));
   if (Number.isNaN(cStage)) {
@@ -265,6 +283,7 @@ window.addEventListener("load", async () => {
   randomWeaponPrompt.parent = document.getElementById("chosenWeaponPrompt");
 
   selectedWeapon.element = document.getElementById("selectedWeapon");
+  selectedWeapon.imgElement = document.getElementById("selectedWeaponImage");
   selectedWeapon.originalText = selectedWeapon.element.innerText;
 
   /** @type {HTMLDivElement} */
