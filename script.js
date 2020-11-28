@@ -27,11 +27,16 @@ const randomWeaponPrompt = {
 }
 
 /** @type {ElementWDynamicText} */
-let selectedWeapon = {
+const selectedWeapon = {
   element: null,
   originalText: "",
   name: null
 };
+
+const weaponList = {
+  element: null,
+  buttons: [ ]
+}
 
 const weaponBlacklist = {};
 
@@ -74,23 +79,11 @@ function pickRandomWeapon(stageI = 0, blacklist = weaponBlacklist) {
 }
 
 /**
- * Updates things that are always shown
- */
-function updateMainView() {
-  currentStage.element.innerText = currentStage.originalText.replace(
-    "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
-  );
-  selectedWeapon.element.innerText = selectedWeapon.originalText.replace("%CURRENT_WEAPON%", selectedWeapon.name === null || selectedWeapon.name === undefined ? "None" : selectedWeapon.name);
-  availWeapons.element.innerText = availWeapons.originalText.replace("%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length);
-}
-
-/**
  * Goes to the next stage
  */
 function nextStage() {
   populateWeaponList();
   currentStage.current = Math.min(Math.max(++currentStage.current, 0), data.stages.length - 1);
-  updateMainView();
 }
 
 /**
@@ -99,7 +92,6 @@ function nextStage() {
 function previousStage() {
   populateWeaponList();
   currentStage.current = Math.min(Math.max(--currentStage.current, 0), data.stages.length - 1);
-  updateMainView();
 }
 
 /**
@@ -117,14 +109,12 @@ function getRandomWeaponPressed() {
  * Populates the list of weapons and creates all needed elements
  */
 function populateWeaponList() {
-  /** @type {HTMLDivElement} */
-  const wList = document.getElementById("weaponList");
-  if (wList.classList.contains("hidden")) {
+  if (weaponList.element.classList.contains("hidden")) {
     return;
   }
 
-  while (wList.lastElementChild !== null) {
-    wList.removeChild(wList.lastElementChild);
+  while (weaponList.element.lastElementChild !== null) {
+    weaponList.element.removeChild(weaponList.element.lastElementChild);
   }
 
   const allWeapons = getAvailableWeapons(currentStage.current, { });
@@ -143,37 +133,44 @@ function populateWeaponList() {
       if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
       button.innerText = weaponBlacklist[name] ? "WHITELIST" : "BLACKLIST";
       label.innerHTML = `<span style="color: ${selectedWeapon.name === name ? "blue" : weaponBlacklist[name] ? "red" : "green"}">${name}</span>`;
-      updateMainView();
     }
 
     button.onclick(undefined, undefined, true);
 
-    wList.appendChild(button);
-    wList.appendChild(label);
-    wList.appendChild(document.createElement("br"));
+    weaponList.element.appendChild(button);
+    weaponList.element.appendChild(label);
+    weaponList.element.appendChild(document.createElement("br"));
+
+    weaponList.buttons.push(button);
   });
 }
 
 /**
- * Syncs the specified weapon's button with its weapon's status
- * @param {String} name - The name of the weapon to sync
+ * Updates all elements on the page with the right information
  */
-function syncWeaponButton(name) {
-  if (name === null) { return; }
-  const buttonToSync = document.getElementById(`blacklistButton_${name}`);
-  if (buttonToSync === null) { return; }
-  buttonToSync.onclick(undefined, undefined, true);
+function updateElements() {
+  currentStage.element.innerText = currentStage.originalText.replace(
+    "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
+  );
+  selectedWeapon.element.innerText = selectedWeapon.originalText.replace("%CURRENT_WEAPON%", selectedWeapon.name === null || selectedWeapon.name === undefined ? "None" : selectedWeapon.name);
+  availWeapons.element.innerText = availWeapons.originalText.replace("%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length);
+  
+  if (!weaponList.element.classList.contains("hidden")) {
+    weaponList.buttons.forEach(
+      b => b.onclick(undefined, undefined, true)
+    );
+  }
+
+  requestAnimationFrame(updateElements);
 }
 
 /**
  * Toggles weapon list's visibility
  */
 function toggleWeaponList() {
-  /** @type {HTMLDivElement} */
-  const wList = document.getElementById("weaponList");
-  wList.classList.toggle("hidden");
+  weaponList.element.classList.toggle("hidden");
 
-  if (!wList.classList.contains("hidden")) {
+  if (!weaponList.element.classList.contains("hidden")) {
     populateWeaponList();
   }
 }
@@ -184,16 +181,10 @@ function toggleWeaponList() {
  */
 function acceptRandomWeapon(addToBlacklist = false) {
   randomWeaponPrompt.parent.classList.add("hidden");
-  const oldWeapon = selectedWeapon.name;
   selectedWeapon.name = randomWeaponPrompt.current;
   if (addToBlacklist) {
     weaponBlacklist[selectedWeapon.name] = true;
   }
-  
-  syncWeaponButton(selectedWeapon.name);
-  syncWeaponButton(oldWeapon);
-
-  updateMainView();
 }
 
 /**
@@ -202,16 +193,10 @@ function acceptRandomWeapon(addToBlacklist = false) {
  */
 function rejectRandomWeapon(addToBlacklist = false) {
   randomWeaponPrompt.parent.classList.add("hidden");
-  const oldWeapon = selectedWeapon.name;
   selectedWeapon.name = null;
   if (addToBlacklist) {
     weaponBlacklist[randomWeaponPrompt.current] = true;
   }
-  
-  syncWeaponButton(randomWeaponPrompt.current);
-  syncWeaponButton(oldWeapon);
-
-  updateMainView();
 }
 
 window.addEventListener("load", async () => {
@@ -228,7 +213,12 @@ window.addEventListener("load", async () => {
   selectedWeapon.element = document.getElementById("selectedWeapon");
   selectedWeapon.originalText = selectedWeapon.element.innerText;
 
+  /** @type {HTMLDivElement} */
+  weaponList.element = document.getElementById("weaponList");
+
   data = await (await fetch("data.json")).json();
 
   nextStage();
+
+  updateElements();
 })
