@@ -86,3 +86,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+#credits {
+  font-size: 15px;
+}

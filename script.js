@@ -218,7 +218,9 @@ window.addEventListener("load", async () => {
 
   data = await (await fetch("data.json")).json();
 
-  nextStage();
+  const creditsDiv = document.getElementById("credits");
+  creditsDiv.innerText = creditsDiv.innerText.replace("%DATA_PROVIDER%", data.$meta.author);
 
+  nextStage();
   updateElements();
 })
