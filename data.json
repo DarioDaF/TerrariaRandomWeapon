@@ -539,7 +539,7 @@
       "weapons": [
         {
           "name": "Phaseblade",
-          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/e/e2/Phaseblade.gif/revision/latest/scale-to-width-down/48?cb=20200823141302"
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/e/e2/Phaseblade.gif"
         },
         {
           "name": "Fiery Greatsword",
@@ -722,7 +722,7 @@
         },
         {
           "name": "Phasesaber",
-          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/a/a4/Phasesaber.gif/revision/latest/scale-to-width-down/48?cb=20201111220959"
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/a/a4/Phasesaber.gif"
         },
         {
           "name": "Ice Sickle",
