@@ -699,6 +699,7 @@
     },
     {
       "name": "Hard Mode",
+      "clearPreviousWeapons": true,
       "weapons": [
         {
           "name": "Pearlwood Sword",

@@ -53,18 +53,14 @@ let data = {};
  * @returns {WeaponData[]} An array that contains all available weapons
  */
 function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
-  const weapons = [];
+  let weapons = [];
   /** @type {String[]} */
   const stages = data.stages;
   stageI = Math.min(Math.max(stageI, 0), stages.length);
-  // checks for hardmode, excludes pre-hardmode weapons 
-  let hardmode;
-  if (stageI >= 6) {
-	  hardmode = 6;
-  } else {
-	  hardmode = 0;
-  }
-  for (let i = hardmode; i <= stageI; i++) {
+  for (let i = 0; i <= stageI; i++) {
+    if (stages[i].clearPreviousWeapons) {
+      weapons = [];
+    }
     weapons.push(...stages[i].weapons);
   }
   return weapons.filter(w => !blacklist[w.name]);
