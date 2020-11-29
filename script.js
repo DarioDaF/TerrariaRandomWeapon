@@ -59,7 +59,7 @@ function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
   stageI = Math.min(Math.max(stageI, 0), stages.length);
   // checks for hardmode, excludes pre-hardmode weapons 
   let hardmode;
-  if (stageI > 6) {
+  if (stageI >= 6) {
 	  hardmode = 6;
   } else {
 	  hardmode = 0;
