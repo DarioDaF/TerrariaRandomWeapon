@@ -90,16 +90,16 @@ function pickRandomWeapon(stageI = 0, blacklist = weaponBlacklist) {
  * Goes to the next stage
  */
 function nextStage() {
-  populateWeaponList();
   currentStage.current = Math.min(Math.max(++currentStage.current, 0), data.stages.length - 1);
+  populateWeaponList();
 }
 
 /**
  * Goes back to the previous stage
  */
 function previousStage() {
-  populateWeaponList();
   currentStage.current = Math.min(Math.max(--currentStage.current, 0), data.stages.length - 1);
+  populateWeaponList();
 }
 
 /**
