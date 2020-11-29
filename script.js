@@ -16,7 +16,8 @@ function stateReset(apply = true) {
     weaponBlacklist: {},
     selectedWeapon: null,
     enableStageClearPreviousWeapons: true,
-    sortWeapons: 'availabilityAndName'
+    sortWeapons: 'availabilityAndName',
+    openWeaponList: false
   };
   if (apply) {
     state = rstState;
@@ -26,6 +27,11 @@ function stateReset(apply = true) {
 
 let state = stateReset(false);
 
+function toggleStageClear() {
+  state.enableStageClearPreviousWeapons = !state.enableStageClearPreviousWeapons;
+  stateChanged();
+}
+
 function stateChanged() {
   saveToLocal();
   updateElements();
@@ -33,6 +39,8 @@ function stateChanged() {
 
 const currentStage = new DynamicElement();
 const availWeapons = new DynamicElement();
+const optWeaponList = new DynamicElement();
+const optStageClear = new DynamicElement();
 
 const randomWeaponPrompt = Object.assign(
   new DynamicElement(null, {}, true),
@@ -172,11 +180,10 @@ function getRandomWeaponPressed() {
  * Populates the list of weapons and creates all needed elements
  */
 function populateWeaponList() {
-  /*
-  if (weaponList.element.classList.contains("hidden")) {
+  weaponList.element.classList.toggle("hidden", !state.openWeaponList);
+  if (!state.openWeaponList) {
     return;
   }
-  */
 
   while (weaponList.element.lastElementChild !== null) {
     weaponList.element.removeChild(weaponList.element.lastElementChild);
@@ -184,7 +191,7 @@ function populateWeaponList() {
 
   const allWeapons = getAvailableWeapons(state.currentStage, { });
   allWeapons.sort(SORTMODES[state.sortWeapons].cmpFn);
-  allWeapons.forEach(weapon => {
+  for (const weapon of allWeapons) {
     const name = weapon.name;
     const div = document.createElement("div");
 
@@ -207,7 +214,7 @@ function populateWeaponList() {
     div.appendChild(label);
 
     weaponList.element.appendChild(div);
-  });
+  };
 }
 
 /**
@@ -217,6 +224,8 @@ function updateElements() {
   currentStage.update({ CURRENT_STAGE: `${getStageName(state.currentStage)} (${state.currentStage + 1}/${data.stages.length})` });
   selectedWeapon.update({ CURRENT_WEAPON: createWeaponHTML(state.selectedWeapon) });
   availWeapons.update({ WEAPON_COUNT: getAvailableWeapons(state.currentStage, state.weaponBlacklist).length });
+  optWeaponList.update({ ACTION: state.openWeaponList ? "Close" : "Open" });
+  optStageClear.update({ ACTION: state.enableStageClearPreviousWeapons ? "Disable" : "Enable" });
 
   populateWeaponList();
 }
@@ -225,13 +234,8 @@ function updateElements() {
  * Toggles weapon list's visibility
  */
 function toggleWeaponList() {
-  weaponList.element.classList.toggle("hidden");
-
-  /*
-  if (!weaponList.element.classList.contains("hidden")) {
-    populateWeaponList();
-  }
-  */
+  state.openWeaponList = !state.openWeaponList;
+  stateChanged();
 }
 
 /**
@@ -320,6 +324,8 @@ window.addEventListener("load", async () => {
   randomWeaponPrompt.element = document.getElementById("randomlySelectedWeapon");
   selectedWeapon.element = document.getElementById("selectedWeapon");
   weaponList.element = document.getElementById("weaponList");
+  optWeaponList.element = document.getElementById("optWeaponList");
+  optStageClear.element = document.getElementById("optStageClear");
 
   data = await (await fetch("data.json")).json();
 

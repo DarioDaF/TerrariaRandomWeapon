@@ -20,7 +20,8 @@
       <button class="defaultButton" onclick="getRandomWeaponPressed()">Get Random Weapon</button>
       <button class="defaultButton" onclick="nextStage()">Next Stage</button>
       <button class="defaultButton" onclick="previousStage()">Previous Stage</button>
-      <button class="defaultButton" onclick="toggleWeaponList()">Toggle Weapon List</button>
+      <button class="defaultButton" id="optWeaponList" onclick="toggleWeaponList()">%ACTION% Weapon List</button>
+      <button class="defaultButton" id="optStageClear" onclick="toggleStageClear()">%ACTION% Weapon Clear on Difficulty Jump</button>
     </div>
     <div class="centered container hidden" id="chosenWeaponPrompt">
       <p class="defaultText" id="randomlySelectedWeapon">Picked %SELECTED_WEAPON%</p>
