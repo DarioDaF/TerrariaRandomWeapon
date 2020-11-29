@@ -5,13 +5,14 @@
     <!-- meta name="viewport" content="width=device-width, initial-scale=1.0" -->
     <title>Terraira Random Weapon</title>
     <link rel="stylesheet" href="style.css">
+    <script src="percentTemplate.js"></script>
     <script src="script.js"></script>
   </head>
   <body>
     <div class="defaultText bottom right" style="position: absolute;" id="credits">Thanks to %DATA_PROVIDER% for providing all the data!</div>
     <div class="top right" style="position: absolute;">
-      <button class="defaultButton" style="display: block; width: fit-content;" onclick="saveToLocal()">Save</button>
-      <button class="defaultButton" style="display: block; width: fit-content;" onclick="loadFromLocal()">Load</button>
+      <button class="defaultButton" style="display: block; width: fit-content;" onclick="saveToFile()">Save</button>
+      <button class="defaultButton" style="display: block; width: fit-content;" onclick="loadFromFile()">Load</button>
     </div>
     <div class="centered container">
       <p class="defaultText" id="currentStage">Current Stage: %CURRENT_STAGE%</p>
@@ -23,10 +24,10 @@
     </div>
     <div class="centered container hidden" id="chosenWeaponPrompt">
       <p class="defaultText" id="randomlySelectedWeapon">Picked %SELECTED_WEAPON%</p>
-      <button class="defaultButton" onclick="acceptRandomWeapon()">Accept</button>
-      <button class="defaultButton" onclick="acceptRandomWeapon(true)">Accept & Blacklist</button>
-      <button class="defaultButton" onclick="rejectRandomWeapon()">Reject</button>
-      <button class="defaultButton" onclick="rejectRandomWeapon(true)">Reject & Blacklist</button>
+      <button class="defaultButton" onclick="confirmRandomWeapon(true, false)">Accept</button>
+      <button class="defaultButton" onclick="confirmRandomWeapon(true, true)">Accept & Blacklist</button>
+      <button class="defaultButton" onclick="confirmRandomWeapon(false, false)">Reject</button>
+      <button class="defaultButton" onclick="confirmRandomWeapon(false, true)">Reject & Blacklist</button>
     </div>
     <div class="top left container hidden" id="weaponList"></div>
     <div class="bottom left container">

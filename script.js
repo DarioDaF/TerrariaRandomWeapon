@@ -1,64 +1,102 @@
 
+//import { DynamicElement } from './percentTemplate.js';
+
 /**
  * @typedef WeaponData
  * @property {String} name
  * @property {String} img
  */
 
-const currentStage = {
-  /** @type {HTMLDivElement} */
-  element: null,
-  originalText: "",
-  current: -1
+/**
+ * Resets the state of the run
+ */
+function stateReset(apply = true) {
+  const rstState = {
+    currentStage: 0,
+    weaponBlacklist: {},
+    selectedWeapon: null,
+    enableStageClearPreviousWeapons: true,
+    sortWeapons: 'availabilityAndName'
+  };
+  if (apply) {
+    state = rstState;
+  }
+  return rstState;
 }
 
-const availWeapons = {
-  /** @type {HTMLDivElement} */
-  element: null,
-  originalText: ""
+let state = stateReset(false);
+
+function stateChanged() {
+  saveToLocal();
+  updateElements();
 }
 
-const randomWeaponPrompt = {
-  /** @type {HTMLDivElement} */
-  element: null,
-  /** @type {HTMLDivElement} */
-  parent: null,
-  originalText: "",
-  /** @type {WeaponData} */
-  current: null
-}
+const currentStage = new DynamicElement();
+const availWeapons = new DynamicElement();
 
-const selectedWeapon = {
-  /** @type {HTMLDivElement} */
-  element: null,
-  originalText: "",
-  /** @type {WeaponData} */
-  selected: null
-};
+const randomWeaponPrompt = Object.assign(
+  new DynamicElement(null, {}, true),
+  {
+    /** @type {WeaponData} */
+    current: null
+  }
+);
+
+const selectedWeapon = new DynamicElement(null, {}, true);
 
 const weaponList = {
   /** @type {HTMLDivElement} */
-  element: null,
-  /** @type {HTMLButtonElement[]} */
-  buttons: [ ]
+  element: null
 }
 
-let weaponBlacklist = {};
-
 let data = {};
+
+function lexOrder(a1, a2) {
+  const l = Math.min(a1.length, a2.length);
+  for(let i = 0; i < l; ++i) {
+    if (a1[i] < a2[i]) {
+      return -1;
+    } else if (a1[i] > a2[i]) {
+      return 1;
+    }
+  }
+  if (a1.length < a2.length) {
+    return -1;
+  } else if (a1.length > a2.length) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+const SORTMODES = {
+  'name': {
+    label: 'Name',
+    cmpFn: (w1, w2) => lexOrder([w1.name], [w2.name])
+  },
+  'availability': {
+    label: 'Availability',
+    cmpFn: (w1, w2) => lexOrder([!!state.weaponBlacklist[w1.name]], [!!state.weaponBlacklist[w2.name]])
+  },
+  'availabilityAndName': {
+    label: 'Availability and Name',
+    cmpFn: (w1, w2) => lexOrder([!!state.weaponBlacklist[w1.name], w1.name], [!!state.weaponBlacklist[w2.name], w2.name])
+  }
+};
+
 /**
  * Gets all available weapons at the specified stage with the specified blacklist
  * @param {Number} [stageI] - The stage's index
  * @param {Object<String, Boolean>} [blacklist] - The weapons' blacklist
  * @returns {WeaponData[]} An array that contains all available weapons
  */
-function getAvailableWeapons(stageI = 0, blacklist = weaponBlacklist) {
+function getAvailableWeapons(stageI = 0, blacklist = state.weaponBlacklist) {
   let weapons = [];
   /** @type {String[]} */
   const stages = data.stages;
   stageI = Math.min(Math.max(stageI, 0), stages.length);
   for (let i = 0; i <= stageI; i++) {
-    if (stages[i].clearPreviousWeapons) {
+    if (state.enableStageClearPreviousWeapons && stages[i].clearPreviousWeapons) {
       weapons = [];
     }
     weapons.push(...stages[i].weapons);
@@ -81,7 +119,7 @@ function getStageName(stageI = 0) {
  * @param {Object<String, Boolean>} [blacklist] - The weapons' blacklist
  * @returns {WeaponData} The name of a randomly picked weapon
  */
-function pickRandomWeapon(stageI = 0, blacklist = weaponBlacklist) {
+function pickRandomWeapon(stageI = 0, blacklist = state.weaponBlacklist) {
   const availWeapons = getAvailableWeapons(stageI, blacklist);
   return availWeapons[Math.floor(Math.random() * availWeapons.length)];
 }
@@ -90,16 +128,20 @@ function pickRandomWeapon(stageI = 0, blacklist = weaponBlacklist) {
  * Goes to the next stage
  */
 function nextStage() {
-  currentStage.current = Math.min(Math.max(++currentStage.current, 0), data.stages.length - 1);
-  populateWeaponList();
+  if (state.currentStage < data.stages.length - 1) {
+    ++state.currentStage;
+    stateChanged();
+  }
 }
 
 /**
  * Goes back to the previous stage
  */
 function previousStage() {
-  currentStage.current = Math.min(Math.max(--currentStage.current, 0), data.stages.length - 1);
-  populateWeaponList();
+  if (state.currentStage > 0) {
+    --state.currentStage;
+    stateChanged();
+  }
 }
 
 /**
@@ -121,27 +163,27 @@ function createWeaponHTML(weapon) {
 function getRandomWeaponPressed() {
   randomWeaponPrompt.parent.classList.remove("hidden");
   
-  const selWeapon = pickRandomWeapon(currentStage.current);
+  const selWeapon = pickRandomWeapon(state.currentStage);
   randomWeaponPrompt.current = selWeapon;
-  randomWeaponPrompt.element.innerHTML = randomWeaponPrompt.originalText.replace("%SELECTED_WEAPON%", createWeaponHTML(selWeapon));
+  randomWeaponPrompt.update({ SELECTED_WEAPON: createWeaponHTML(selWeapon) });
 }
 
 /**
  * Populates the list of weapons and creates all needed elements
  */
 function populateWeaponList() {
+  /*
   if (weaponList.element.classList.contains("hidden")) {
     return;
   }
+  */
 
   while (weaponList.element.lastElementChild !== null) {
     weaponList.element.removeChild(weaponList.element.lastElementChild);
   }
-  
-  weaponList.buttons = [ ];
 
-  const allWeapons = getAvailableWeapons(currentStage.current, { });
-  allWeapons.sort((a, b) => { return a.name > b.name ? 1 : -1; });
+  const allWeapons = getAvailableWeapons(state.currentStage, { });
+  allWeapons.sort(SORTMODES[state.sortWeapons].cmpFn);
   allWeapons.forEach(weapon => {
     const name = weapon.name;
     const div = document.createElement("div");
@@ -149,34 +191,22 @@ function populateWeaponList() {
     const button = document.createElement("button");
     button.id = `blacklistButton_${name}`;
     button.classList.add("defaultButton", "weaponListButton", "left");
+    button.innerText = state.weaponBlacklist[name] ? "W" : "B";
 
     const label = document.createElement("label");
-    label.innerText = "";
+    label.innerHTML = `<span style="color: ${state.selectedWeapon !== null && state.selectedWeapon.name === name ? "blue" : state.weaponBlacklist[name] ? "red" : "white"}">${createWeaponHTML(weapon)}</span>`;
     label.classList.add("defaultText", "weaponListLabel");
     label.htmlFor = button.id;
 
-    button.onclick = (b, ev, sync = false) => {
-      if (!sync) { weaponBlacklist[name] = !weaponBlacklist[name]; }
-
-      const newButtonText = weaponBlacklist[name] ? "W" : "B";
-      if (button.innerText !== newButtonText) {
-        button.innerText = newButtonText;
-      }
-
-      const newLabelHTML = `<span style="color: ${selectedWeapon.selected !== null && selectedWeapon.selected.name === name ? "blue" : weaponBlacklist[name] ? "red" : "white"}">${createWeaponHTML(weapon)}</span>`;
-      if (label.innerHTML !== newLabelHTML) {
-        label.innerHTML = newLabelHTML;
-      }
-    }
-
-    button.onclick(undefined, undefined, true);
+    button.addEventListener("click", (ev) => {
+      state.weaponBlacklist[name] = !state.weaponBlacklist[name];
+      stateChanged();
+    });
 
     div.appendChild(button);
     div.appendChild(label);
 
     weaponList.element.appendChild(div);
-
-    weaponList.buttons.push(button);
   });
 }
 
@@ -184,26 +214,11 @@ function populateWeaponList() {
  * Updates all elements on the page with the right information
  */
 function updateElements() {
-  currentStage.element.innerText = currentStage.originalText.replace(
-    "%CURRENT_STAGE%", `${getStageName(currentStage.current)} (${currentStage.current + 1}/${data.stages.length})`
-  );
-  
-  const selWeaponHTML = selectedWeapon.originalText.replace("%CURRENT_WEAPON%", createWeaponHTML(selectedWeapon.selected));
-  if (selWeaponHTML !== selectedWeapon.element.innerHTML) {
-    selectedWeapon.element.innerHTML = selWeaponHTML;
-  }
-  
-  availWeapons.element.innerText = availWeapons.originalText.replace(
-    "%WEAPON_COUNT%", getAvailableWeapons(currentStage.current, weaponBlacklist).length
-  );
-  
-  if (!weaponList.element.classList.contains("hidden")) {
-    weaponList.buttons.forEach(
-      b => b.onclick(undefined, undefined, true)
-    );
-  }
+  currentStage.update({ CURRENT_STAGE: `${getStageName(state.currentStage)} (${state.currentStage + 1}/${data.stages.length})` });
+  selectedWeapon.update({ CURRENT_WEAPON: createWeaponHTML(state.selectedWeapon) });
+  availWeapons.update({ WEAPON_COUNT: getAvailableWeapons(state.currentStage, state.weaponBlacklist).length });
 
-  requestAnimationFrame(updateElements);
+  populateWeaponList();
 }
 
 /**
@@ -212,101 +227,117 @@ function updateElements() {
 function toggleWeaponList() {
   weaponList.element.classList.toggle("hidden");
 
+  /*
   if (!weaponList.element.classList.contains("hidden")) {
     populateWeaponList();
   }
+  */
 }
 
 /**
- * Accepts the currently random picked weapon
+ * Accepts or rejects the currently random picked weapon
+ * @param {Boolean} accept - Whether or not to accept the weapon
  * @param {Boolean} addToBlacklist - Whether or not to add the weapon to the blacklist
  */
-function acceptRandomWeapon(addToBlacklist = false) {
+function confirmRandomWeapon(accept = true, addToBlacklist = true) {
   randomWeaponPrompt.parent.classList.add("hidden");
-  selectedWeapon.selected = randomWeaponPrompt.current;
+  state.selectedWeapon = accept ? randomWeaponPrompt.current : null;
   if (addToBlacklist) {
-    weaponBlacklist[selectedWeapon.selected.name] = true;
+    state.weaponBlacklist[randomWeaponPrompt.current.name] = true;
   }
+  stateChanged();
 }
 
-/**
- * Rejects the currently random picked weapon
- * @param {Boolean} addToBlacklist - Whether or not to add the weapon to the blacklist
- */
-function rejectRandomWeapon(addToBlacklist = false) {
-  randomWeaponPrompt.parent.classList.add("hidden");
-  selectedWeapon.selected = null;
-  if (addToBlacklist) {
-    weaponBlacklist[randomWeaponPrompt.current.name] = true;
-  }
+function stateSave() {
+  return JSON.stringify(state);
 }
 
 /**
  * Saves the current state to localStorage
  */
 function saveToLocal() {
-  localStorage.clear();
-  localStorage.setItem("weaponBlacklist", JSON.stringify(weaponBlacklist));
-  localStorage.setItem("selectedWeapon", JSON.stringify(selectedWeapon.selected));
-  localStorage.setItem("currentStage", currentStage.current);
+  localStorage.clear(); // Needed?
+  localStorage.setItem("state", stateSave());
+}
+
+/**
+ * Saves the current state to localStorage
+ */
+function saveToFile() {
+  const blob = new Blob([stateSave()], {
+    type: "application/json"
+  });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "TerrariaRandomWeapon.save";
+  //document.body.appendChild(a);
+  a.click();
+  //document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+
+function stateLoad(str) {
+  state = Object.assign(
+    stateReset(false),
+    JSON.parse(str) || {}
+  );
+  stateChanged(); // Update datastore I guess???
 }
 
 /**
  * Loads a saved state from localStorage
  */
 function loadFromLocal() {
-  const wBlacklist = localStorage.getItem("weaponBlacklist");
-  if (wBlacklist === null) {
-    weaponBlacklist = { };
-  } else {
-    try {
-      weaponBlacklist = JSON.parse(wBlacklist);
-    } catch (error) {
-      localStorage.removeItem("weaponBlacklist");
-      console.log("There was an error while parsing weapon blacklist and it was reset!");
-      console.error(error);
-    }
-  }
-  
-  const sWeapon = localStorage.getItem("selectedWeapon");
-  try {
-    selectedWeapon.selected = JSON.parse(sWeapon);
-  } catch (error) {
-    localStorage.removeItem("selectedWeapon");
-    console.log("There was an error while parsing selected weapon and it was reset!");
-    console.error(error);
-  }
+  stateLoad(localStorage.getItem("state"));
+}
 
-  const cStage = Number(localStorage.getItem("currentStage"));
-  if (Number.isNaN(cStage)) {
-    currentStage.current = 0;
-  } else {
-    currentStage.current = cStage;
-  }
+function loadFromFile() {
+  const i = document.createElement("input");
+  i.type = "file";
+  i.accept = ".save"; //"application/json";
+
+  i.addEventListener("change", ev => {
+    const file = ev.target.files[0];
+    
+    const reader = new FileReader();
+
+    // here we tell the reader what to do when it's done reading...
+    reader.addEventListener("load", readerEvent => {
+      stateLoad(readerEvent.target.result);
+    });
+    
+    reader.readAsText(file, "UTF-8");
+  });
+
+  //document.body.appendChild(i);
+  i.click();
+  //document.body.removeChild(i);
 }
 
 window.addEventListener("load", async () => {
   currentStage.element = document.getElementById("currentStage");
-  currentStage.originalText = currentStage.element.innerText;
-  
   availWeapons.element = document.getElementById("availWeapons");
-  availWeapons.originalText = availWeapons.element.innerText;
-
   randomWeaponPrompt.element = document.getElementById("randomlySelectedWeapon");
-  randomWeaponPrompt.originalText = randomWeaponPrompt.element.innerText;
-  randomWeaponPrompt.parent = document.getElementById("chosenWeaponPrompt");
-
   selectedWeapon.element = document.getElementById("selectedWeapon");
-  selectedWeapon.originalText = selectedWeapon.element.innerText;
-
-  /** @type {HTMLDivElement} */
   weaponList.element = document.getElementById("weaponList");
 
   data = await (await fetch("data.json")).json();
 
-  const creditsDiv = document.getElementById("credits");
-  creditsDiv.innerText = creditsDiv.innerText.replace("%DATA_PROVIDER%", data.$meta.author);
+  new DynamicElement(
+    document.getElementById("credits"),
+    { DATA_PROVIDER: data.$meta.author }
+  );
 
-  nextStage();
-  updateElements();
-})
+  /*
+  document.body.onbeforeunload = (ev) => {
+    // Show unsaved state
+    if (isDirty) {
+      ev.preventDefault();
+      ev.returnValue = '';
+      return '';
+    }
+  };
+  */
+
+  loadFromLocal();
+});
