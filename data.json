@@ -107,6 +107,14 @@
           "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/f/f3/Mandible_Blade.png"
         },
         {
+          "name": "Tentacle Spike",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/a/ab/Tentacle_Spike.png"
+        },
+        {
+          "name": "Bat Bat",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/7/78/Bat_Bat.png"
+        },
+        {
           "name": "Stylish Scissors",
           "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/9/90/Stylish_Scissors.png"
         },
@@ -499,6 +507,10 @@
           "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/f/f1/Slime_Staff.png"
         },
         {
+          "name": "Abigail's Flower",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/4/4e/Abigail%27s_Flower.png"
+        },
+        {
           "name": "Flinx Staff",
           "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/d/de/Flinx_Staff.png"
         },
@@ -584,6 +596,23 @@
         {
           "name": "Ballista Rod",
           "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/9/99/Ballista_Rod.png"
+        }
+      ]
+    },
+    {
+      "name": "Deerclops",
+      "weapons": [
+        {
+          "name": "Pew-matic Horn",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/4/48/Pew-matic_Horn.png"
+        },
+        {
+          "name": "Weather Pain",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/5/5d/Weather_Pain.png"
+        },
+        {
+          "name": "Houndius Shootius",
+          "img": "tatic.wikia.nocookie.net/terraria_gamepedia/images/c/c8/Houndius_Shootius.png"
         }
       ]
     },
@@ -760,6 +789,10 @@
         {
           "name": "Titanium Sword",
           "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/d/d3/Titanium_Sword.png"
+        },
+        {
+          "name": "Ham Bat",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/b/b9/Ham_Bat.png"
         },
         {
           "name": "Fetid Baghnakhs",
