@@ -1,10 +1,8 @@
 
 const TRW_VERSION = '0.0.1';
 
-/*
 import { DynamicElement } from './percentTemplate.mjs';
 import { statePotentialUpdate } from './updateCode.mjs';
-*/
 
 /**
  * @typedef WeaponData
