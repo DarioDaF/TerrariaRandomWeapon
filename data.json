@@ -2,6 +2,7 @@
   "$meta": {
     "author": "rotyler"
   },
+  "terrariaVersion": "1.4.4.7",
   "stages": [
     {
       "name": "Pre Hardmode",

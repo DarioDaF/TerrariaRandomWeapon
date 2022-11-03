@@ -1,5 +1,8 @@
 
-//import { DynamicElement } from './percentTemplate.js';
+const TRW_VERSION = '0.0.1';
+
+import { DynamicElement } from './percentTemplate.mjs';
+import { statePotentialUpdate } from './updateCode.mjs';
 
 /**
  * @typedef WeaponData
@@ -10,8 +13,10 @@
 /**
  * Resets the state of the run
  */
-function stateReset(apply = true) {
+function stateReset() {
   const rstState = {
+    terrariaVersion: data.terrariaVersion,
+    trwVersion: TRW_VERSION,
     currentStage: 0,
     weaponBlacklist: {},
     selectedWeapon: null,
@@ -19,13 +24,10 @@ function stateReset(apply = true) {
     sortWeapons: 'availabilityAndName',
     openWeaponList: false
   };
-  if (apply) {
-    state = rstState;
-  }
   return rstState;
 }
 
-let state = stateReset(false);
+let state = stateReset();
 
 function toggleStageClear() {
   state.enableStageClearPreviousWeapons = !state.enableStageClearPreviousWeapons;
@@ -281,9 +283,10 @@ function saveToFile() {
 }
 
 function stateLoad(str) {
+  const otherState = statePotentialUpdate(JSON.parse(str) || {});
   state = Object.assign(
-    stateReset(false),
-    JSON.parse(str) || {}
+    stateReset(),
+    otherState
   );
   stateChanged(); // Update datastore I guess???
 }
