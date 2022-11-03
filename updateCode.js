@@ -2,7 +2,7 @@
 /**
  * Code to update state from version to version
  */
-export function statePotentialUpdate(state) {
+/* export */ function statePotentialUpdate(state) {
   if (state.currentStage === undefined) {
     return state; // Empty state
   }

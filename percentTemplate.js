@@ -5,7 +5,7 @@
  * @property {String} originalText
  */
 
-export class DynamicElement {
+/* export */ class DynamicElement {
   constructor(element = null, value = {}, useInnerHTML = false) {
     this.value = value;
     this._element = element;
