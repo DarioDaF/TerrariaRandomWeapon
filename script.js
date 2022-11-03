@@ -12,6 +12,8 @@ import { statePotentialUpdate } from './updateCode.mjs';
  * @property {String} img
  */
 
+let data = {};
+
 /**
  * Resets the state of the run
  */
@@ -60,8 +62,6 @@ const weaponList = {
   /** @type {HTMLDivElement} */
   element: null
 }
-
-let data = {};
 
 function lexOrder(a1, a2) {
   const l = Math.min(a1.length, a2.length);
