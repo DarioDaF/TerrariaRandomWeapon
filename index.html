@@ -27,18 +27,18 @@
     <div class="centered container">
       <p class="defaultText" id="currentStage">Current Stage: %CURRENT_STAGE%</p>
       <p class="defaultText" id="availWeapons">Available Weapons: %WEAPON_COUNT%</p>
-      <button class="defaultButton" onclick="getRandomWeaponPressed()">Get Random Weapon</button>
-      <button class="defaultButton" onclick="nextStage()">Next Stage</button>
-      <button class="defaultButton" onclick="previousStage()">Previous Stage</button>
-      <button class="defaultButton" id="optWeaponList" onclick="toggleWeaponList()">%ACTION% Weapon List</button>
-      <button class="defaultButton" id="optStageClear" onclick="toggleStageClear()">%ACTION% Weapon Clear on Difficulty Jump</button>
+      <button class="defaultButton" onclick="trw.getRandomWeaponPressed()">Get Random Weapon</button>
+      <button class="defaultButton" onclick="trw.nextStage()">Next Stage</button>
+      <button class="defaultButton" onclick="trw.previousStage()">Previous Stage</button>
+      <button class="defaultButton" id="optWeaponList" onclick="trw.toggleWeaponList()">%ACTION% Weapon List</button>
+      <button class="defaultButton" id="optStageClear" onclick="trw.toggleStageClear()">%ACTION% Weapon Clear on Difficulty Jump</button>
     </div>
     <div class="centered container hidden" id="chosenWeaponPrompt">
       <p class="defaultText" id="randomlySelectedWeapon">Picked %SELECTED_WEAPON%</p>
-      <button class="defaultButton" onclick="confirmRandomWeapon(true, false)">Accept</button>
-      <button class="defaultButton" onclick="confirmRandomWeapon(true, true)">Accept & Blacklist</button>
-      <button class="defaultButton" onclick="confirmRandomWeapon(false, false)">Reject</button>
-      <button class="defaultButton" onclick="confirmRandomWeapon(false, true)">Reject & Blacklist</button>
+      <button class="defaultButton" onclick="trw.confirmRandomWeapon(true, false)">Accept</button>
+      <button class="defaultButton" onclick="trw.confirmRandomWeapon(true, true)">Accept & Blacklist</button>
+      <button class="defaultButton" onclick="trw.confirmRandomWeapon(false, false)">Reject</button>
+      <button class="defaultButton" onclick="trw.confirmRandomWeapon(false, true)">Reject & Blacklist</button>
     </div>
     <div class="top left container hidden" id="weaponList"></div>
     <div class="bottom left container">

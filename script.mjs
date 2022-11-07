@@ -349,4 +349,15 @@ window.addEventListener("load", async () => {
   */
 
   loadFromLocal();
+
+  // Exported functions for the page
+  window.trw = {
+    getRandomWeaponPressed,
+    nextStage,
+    previousStage,
+    toggleWeaponList,
+    toggleStageClear,
+    confirmRandomWeapon
+  };
+
 });
