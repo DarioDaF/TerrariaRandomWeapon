@@ -334,7 +334,11 @@ window.addEventListener("load", async () => {
 
   new DynamicElement(
     document.getElementById("credits"),
-    { DATA_PROVIDER: data.$meta.author }
+    {
+      DATA_PROVIDER: data.$meta.author,
+      TRW_VERSION: TRW_VERSION,
+      TERRARIA_VERSION: data.terrariaVersion
+    }
   );
 
   /*
@@ -357,7 +361,9 @@ window.addEventListener("load", async () => {
     previousStage,
     toggleWeaponList,
     toggleStageClear,
-    confirmRandomWeapon
+    confirmRandomWeapon,
+    saveToFile,
+    loadFromFile,
   };
 
 });

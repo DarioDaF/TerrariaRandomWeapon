@@ -19,10 +19,13 @@
     <script src="script.mjs" type="module"></script>
   </head>
   <body>
-    <div class="defaultText bottom right" style="position: absolute;" id="credits">Thanks to %DATA_PROVIDER% for providing all the data!</div>
+    <div class="defaultText bottom right" style="position: absolute;" id="credits">
+      <p>Thanks to %DATA_PROVIDER% for providing all the data!</p>
+      <code>TRW V. %TRW_VERSION% | Terraria %TERRARIA_VERSION%</code>
+    </div>
     <div class="top right" style="position: absolute;">
-      <button class="defaultButton" style="display: block; width: fit-content;" onclick="saveToFile()">Save</button>
-      <button class="defaultButton" style="display: block; width: fit-content;" onclick="loadFromFile()">Load</button>
+      <button class="defaultButton" style="display: block; width: fit-content;" onclick="trw.saveToFile()">Save</button>
+      <button class="defaultButton" style="display: block; width: fit-content;" onclick="trw.loadFromFile()">Load</button>
     </div>
     <div class="centered container">
       <p class="defaultText" id="currentStage">Current Stage: %CURRENT_STAGE%</p>
