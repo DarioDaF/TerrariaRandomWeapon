@@ -674,6 +674,14 @@
       "name": "Skeletron",
       "weapons": [
         {
+          "name": "Muramasa",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/c/c2/Muramasa.png"
+        },
+        {
+          "name": "Night's Edge",
+          "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/9/98/Night%27s_Edge.png"
+        },
+        {
           "name": "Valor",
           "img": "https://static.wikia.nocookie.net/terraria_gamepedia/images/e/e9/Valor.png"
         },
